@@ -12,7 +12,9 @@ $ make test
 $ make install
 ```
 
-Example usage can be found in `tests/testLevels.c`:
+Example usage can be found in the `tests` directory.
+
+Simple example:
 
 ```c
 #include <clog.h>
@@ -40,4 +42,33 @@ $ ./build/tests/testLevels
 [09:01:38] [ERROR]: This is a multiline
 [09:01:38] [ERROR]: error
 [09:01:38] [ERROR]: message.
+```
+
+Example of the format API:
+```c
+#include <clog.h>
+int main(void)
+{
+  int ierr=0;
+  ierr=ClogInitialize();CHKERR(ierr);
+  ierr=ClogSetLogLevel(CLOG_LEVEL_INFO);CHKERR(ierr);
+  ierr=ClogLog(CLOG_LEVEL_WARN,"%s","This is a warning with the default format string.");CHKERR(ierr);
+  ierr=ClogLog(CLOG_LEVEL_WARN,"%s","I'm about to change the logger to ouput JSON:");CHKERR(ierr);
+  ierr=ClogSetFormat("{\n\t'time':'%s',\n\t'level':'%s',\n\t'message':'%s'\n}\n");CHKERR(ierr);
+  ierr=ClogLog(CLOG_LEVEL_ERROR,"%s","Some logging info!");CHKERR(ierr);
+  ierr=ClogFinalize();CHKERR(ierr);
+  return 0;
+}
+```
+
+Output:
+```console
+$ ./tests/testFormat
+[01/18/21 - 12:03PM] [WARNING]: This is a warning with the default format string.
+[01/18/21 - 12:03PM] [WARNING]: I'm about to change the logger to ouput JSON:
+{
+	'time':'01/18/21 - 12:03PM',
+	'level':'ERROR',
+	'message':'Some logging info!'
+}
 ```
