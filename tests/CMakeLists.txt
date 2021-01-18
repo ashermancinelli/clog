@@ -1,6 +1,14 @@
-add_executable(testLevels testLevels.c)
-add_executable(testFormat testFormat.c)
 
-foreach(tgt testLevels testFormat)
-  target_link_libraries(${tgt} PRIVATE clog)
+set(targets testLevels testFormat testCallbacks)
+
+set(libraries clog)
+
+if(CLOG_USE_PTHREAD)
+  list(APPEND targets testPthread)
+  list(APPEND libraries Threads::Threads)
+endif()
+
+foreach(target ${targets})
+  add_executable(${target} "${target}.c")
+  target_link_libraries(${target} PRIVATE ${libraries})
 endforeach()

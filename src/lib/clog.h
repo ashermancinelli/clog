@@ -45,9 +45,32 @@ extern int ClogSetFormat(char*);
 
 /**
  * Logs information if given ClogLevel is at least the minimum logging level,
- * which can be set by ClogSetLogLevel.
+ * which can be set by ClogSetLogLevel. If using pthreads (with option
+ * CLOG_USE_PTHREAD), then logging will only run on thread that called
+ * `ClogInitialize`.
  */
 extern int ClogLog(ClogLevel,char*fmt,...);
+
+/**
+ * Register function pointer as an initialization callback, to be called with
+ * argument `arg`. Callback should return 0 on success, nonzero on failure.
+ * This capability can be used to open/close a file pointer or create/free
+ * resources when needed.
+ *
+ * Warning: there is no garuntee which order the callbacks will be ran in. If
+ * you need callbacks to be ordered, call both of them in the correct order
+ * from a single function and register *that* function as the callback.
+ */
+extern int ClogRegisterInitializeCallback(int (*fp)(),void*arg);
+
+/**
+ * Register function pointer as a finalization callback, to be called with
+ * argument `arg`. Callback should return 0 on success, nonzero on failure.
+ */
+extern int ClogRegisterFinalizeCallback(int (*fp)(),void*arg);
+
+/** Ignore pthread locking and log on each thread no matter what. */
+extern int ClogIgnorePthread();
 
 #define CHKERR(ierr) assert(!ierr);
 
