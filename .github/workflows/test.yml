@@ -1,0 +1,30 @@
+name: Tests
+
+on: [push]
+
+jobs:
+  test:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest]
+    steps:
+      - uses: actions/checkout@v2
+      - name: Prebuild
+        shell: bash
+        run: |
+          sudo apt update
+          sudo apt install gcc-10 g++-10
+          mkdir ${{runner.workspace}}/build
+      - name: CMake
+        shell: bash
+        working-directory: ${{runner.workspace}}/build
+        run: cmake $GITHUB_WORKSPACE -DCMAKE_C_COMPILER=gcc-10
+      - name: Build
+        shell: bash
+        working-directory: ${{runner.workspace}}/build
+        run: cmake --build .
+      - name: Test
+        shell: bash
+        working-directory: ${{runner.workspace}}/build
+        run: ctest
