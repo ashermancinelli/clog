@@ -6,7 +6,7 @@ $ git clone https://github.com/ashermancinelli/clog.git
 $ cd clog
 $ mkdir build
 $ cd build
-$ cmake .. -DCMAKE_INSTALL_PREFIX
+$ cmake .. -DCMAKE_INSTALL_PREFIX=/install/prefix
 $ make
 $ make test
 $ make install
@@ -22,10 +22,10 @@ int main()
   int ierr=0;
   ierr=ClogInitialize();assert(!ierr);
   ierr=ClogSetLogLevel(CLOG_LEVEL_INFO);assert(!ierr);
-  ierr=ClogLog(CLOG_LEVEL_WARN,"%s","This is a warning.");CHKERR(ierr);
-  ierr=ClogLog(CLOG_LEVEL_INFO,"%s","This is info.");CHKERR(ierr);
-  ierr=ClogLog(CLOG_LEVEL_ERROR,"%s","This is an error.");CHKERR(ierr);
-  ierr=ClogLog(CLOG_LEVEL_ERROR,"%s","This is a multiline\nerror\nmessage.");CHKERR(ierr);
+  ierr=ClogLog(CLOG_LEVEL_WARN,"%s","This is a warning.");assert(!ierr);
+  ierr=ClogLog(CLOG_LEVEL_INFO,"%s","This is info.");assert(!ierr);
+  ierr=ClogLog(CLOG_LEVEL_ERROR,"%s","This is an error.");assert(!ierr);
+  ierr=ClogLog(CLOG_LEVEL_ERROR,"%s","This is a multiline\nerror\nmessage.");assert(!ierr);
   ierr=ClogFinalize();assert(!ierr);
   return 0;
 }
