@@ -72,3 +72,5 @@ $ ./tests/testFormat
 	'message':'Some logging info!'
 }
 ```
+
+We also have Pthread/fork join/mpi support if your application is threaded. See interface for details.
