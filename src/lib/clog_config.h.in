@@ -1,0 +1,6 @@
+#ifndef _CLOG_CLOG_CONFIG_H
+#define _CLOG_CLOG_CONFIG_H
+
+#cmakedefine CLOG_USE_PTHREAD
+
+#endif

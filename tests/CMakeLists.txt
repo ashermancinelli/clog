@@ -1,2 +1,6 @@
 add_executable(testLevels testLevels.c)
-target_link_libraries(testLevels PRIVATE clog)
+add_executable(testFormat testFormat.c)
+
+foreach(tgt testLevels testFormat)
+  target_link_libraries(${tgt} PRIVATE clog)
+endforeach()

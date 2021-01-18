@@ -1,6 +1,6 @@
 #include <clog.h>
 
-int main()
+int main(void)
 {
   int ierr=0;
   ierr=ClogInitialize();CHKERR(ierr);
