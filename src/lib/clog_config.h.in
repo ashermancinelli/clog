@@ -1,6 +1,8 @@
 #ifndef _CLOG_CLOG_CONFIG_H
 #define _CLOG_CLOG_CONFIG_H
 
-#cmakedefine CLOG_USE_PTHREAD
+#cmakedefine CLOG_HAVE_THREAD
+#cmakedefine CLOG_HAVE_PTHREAD
+#cmakedefine CLOG_HAVE_MPI
 
 #endif

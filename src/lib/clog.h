@@ -3,11 +3,13 @@
 #include <stdarg.h>
 #include <stdio.h>
 #include <assert.h>
+#include <clog_config.h>
 
 /** Possible levels of logging available */
 typedef enum
 {
-  CLOG_LEVEL_INFO=0,
+  CLOG_LEVEL_DEBUG=0,
+  CLOG_LEVEL_INFO,
   CLOG_LEVEL_WARN,
   CLOG_LEVEL_ERROR,
 } ClogLevel;
@@ -71,6 +73,27 @@ extern int ClogRegisterFinalizeCallback(int (*fp)(),void*arg);
 
 /** Ignore pthread locking and log on each thread no matter what. */
 extern int ClogIgnorePthread();
+
+#ifdef CLOG_HAVE_THREAD
+typedef enum
+{
+  CLOG_THREAD_STRATEGY_GETPID=0,
+  CLOG_THREAD_STRATEGY_MPI,
+  CLOG_THREAD_STRATEGY_PTHREAD,
+  CLOG_THREAD_STRATEGY_NUM_STRATEGIES,
+} ClogThreadStrategy;
+
+/**
+ * If you set strategy to anything other than CLOG_THREAD_STRATEGY_GETPID,
+ * you will have to set strategy before forking.
+ */
+extern int ClogSetThreadStrategy(ClogThreadStrategy);
+extern int ClogGetThreadStrategy(ClogThreadStrategy*);
+extern int ClogThreadInitializeStrategies();
+
+/* Passed variable will be set to >0 if should log, else 0 */
+extern int ClogThreadShouldLog(int*);
+#endif
 
 #define CHKERR(ierr) assert(!ierr);
 

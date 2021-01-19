@@ -8,7 +8,7 @@
 #define CLOG_DEFAULT_BUF_SIZE 1024
 #define CLOG_MAX_CALLBACKS 32
 
-#ifdef CLOG_USE_PTHREAD
+#ifdef CLOG_HAVE_PTHREAD
 #include <pthread.h>
 #endif
 
@@ -24,14 +24,6 @@ static char timefmt[CLOG_DEFAULT_BUF_SIZE]="%x - %I:%M%p";
 /** Deafult format string for log messages. */
 static char logfmt[CLOG_DEFAULT_BUF_SIZE]="[%s] [%s]: %s\n";
 
-#ifdef CLOG_USE_PTHREAD
-/**
- * PID which called `ClogInitialize`, eg the one in which logging occurs if
- * multithreaded.
- */
-static pthread_t ClogParentThread=-1;
-#endif
-
 /**
  * Callbacks may be registered through api found in clog.h to perform setup
  * or teardown during initialization of logger.
@@ -43,12 +35,6 @@ static int ClogNumInitializeCallbacks=0;
 static int (*ClogFinalizeCallbacks[CLOG_MAX_CALLBACKS])();
 static void *ClogFinalizeCallbackArgs[CLOG_MAX_CALLBACKS];
 static int ClogNumFinalizeCallbacks=0;
-
-int ClogIgnorePthread()
-{
-  ClogParentThread=-1;
-  return 0;
-}
 
 int ClogRegisterInitializeCallback(int (*fp)(),void*arg)
 {
@@ -102,12 +88,14 @@ int ClogLog(ClogLevel currlvl,char*fmt,...)
   if(currlvl<lvl)
     return 0;
 
-#ifdef CLOG_USE_PTHREAD
-  if(ClogParentThread!=-1 && pthread_self()!=ClogParentThread)
+  int ierr=0;
+#ifdef CLOG_HAVE_THREAD
+  int shouldlog=0;
+  ierr=ClogThreadShouldLog(&shouldlog);CHKERR(ierr);
+  if(!shouldlog)
     return 0;
 #endif
   
-  int ierr=0;
   char buf[CLOG_DEFAULT_BUF_SIZE];
   char *timebuf;
   ierr=ClogGetTimeBuf(&timebuf);CHKERR(ierr);
@@ -126,25 +114,12 @@ int ClogLog(ClogLevel currlvl,char*fmt,...)
   return 0;
 }
 
-int ClogInitializeThreading(void*arg)
-{
-  (void)arg;
-  ClogParentThread=pthread_self();
-  return 0;
-}
-
-int ClogFinalizeThreading(void*arg)
-{
-  return 0;
-}
-
 int ClogInitialize()
 {
   int ierr=0;
 
-#ifdef CLOG_USE_PTHREAD
-  ierr=ClogRegisterInitializeCallback(&ClogInitializeThreading,NULL);CHKERR(ierr);
-  ierr=ClogRegisterFinalizeCallback(&ClogFinalizeThreading,NULL);CHKERR(ierr);
+#ifdef CLOG_HAVE_THREAD
+  ierr=ClogRegisterInitializeCallback(&ClogThreadInitializeStrategies,NULL);CHKERR(ierr);
 #endif
 
   for(int i=0;i<ClogNumInitializeCallbacks;i++)
